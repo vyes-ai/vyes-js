@@ -1,0 +1,45 @@
+{
+  "name": "@veypi/vyesjs",
+  "version": "0.1.0",
+  "description": "vyesjs",
+  "type": "module",
+  "main": "./dist/index.umd.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.umd.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "build:watch": "vite build --watch",
+    "dev": "vite build --watch --mode development",
+    "preview": "vite preview",
+    "prepublishOnly": "npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "javascript",
+    "library"
+  ],
+  "author": "veypi",
+  "license": "MIT",
+  "devDependencies": {
+    "vite": "^5.3.0",
+    "terser": "^5.19.0",
+    "@types/node": "^20.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/veypi/vyesjs.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
