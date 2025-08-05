@@ -10,59 +10,59 @@ import { resolve } from 'path';
 export default defineConfig({
   build: {
     lib: {
-      // 库的入口文件
-      entry: resolve(__dirname, 'src/index.js'),
-      name: 'YourLibraryName', // UMD 格式的全局变量名
-      // 输出文件名
-      fileName: (format) => `index.${format === 'es' ? 'js' : `${format}.cjs`}`
+      entry: resolve(__dirname, 'src/v.js'),
+      name: 'vyesjs',
+      fileName: (format) => {
+        if (format === 'es') return 'vyes.js';
+        if (format === 'umd') return 'vyes.min.js';
+        return `vyes.${format}.js`;
+      },
+      formats: ['es', 'umd']
     },
     rollupOptions: {
-      // 外部依赖，不会被打包进库中
-      external: [
-        // 如果你的库依赖其他包，在这里声明
-        // 'lodash', 'axios' 等
-      ],
+      external: [],
       output: {
-        // 为外部依赖提供全局变量
-        globals: {
-          // 'lodash': '_',
-          // 'axios': 'axios'
-        }
+        // 全局配置，应用到所有格式
+        compact: true,
+        minifyInternalExports: true,
+        // 自定义文件命名规则
+        chunkFileNames: (chunkInfo) => {
+          return '[name]-[hash].js';
+        },
+        assetFileNames: '[name].[ext]'
       }
     },
-    // 代码混淆和压缩配置
+    // 关键配置：强制压缩所有输出
     minify: 'terser',
     terserOptions: {
+      ecma: 2020,
       compress: {
-        drop_console: true,        // 移除 console
-        drop_debugger: true,       // 移除 debugger
-        pure_funcs: ['console.log', 'console.info', 'console.warn'], // 移除特定函数
-        passes: 2,                 // 多次压缩优化
-        unsafe: true,              // 启用不安全的优化
+        drop_console: true,
+        drop_debugger: true,
+        pure_funcs: ['console.log', 'console.info', 'console.warn'],
+        passes: 2,
+        unsafe: true,
         unsafe_comps: true,
-        unsafe_math: true
+        unsafe_math: true,
+        unsafe_proto: true,
+        toplevel: true,  // 重要：启用顶级压缩
+        module: true     // 重要：告诉 terser 这是 ES 模块
       },
       mangle: {
-        toplevel: true,            // 混淆顶级作用域
+        toplevel: true,
+        module: true,    // 重要：ES 模块的 mangle 设置
         properties: {
-          regex: /^_/              // 混淆以 _ 开头的属性
+          regex: /^_/
         }
       },
       format: {
-        comments: false,           // 移除注释
-        ascii_only: true          // 只输出 ASCII 字符
+        comments: false,
+        ascii_only: true
       }
     },
-    // 输出目录
     outDir: 'dist',
-    // 清空输出目录
     emptyOutDir: true,
-    // 生成源码映射（生产环境建议关闭）
-    sourcemap: false
-  },
-  // 开发服务器配置
-  server: {
-    port: 3000,
-    open: true
+    sourcemap: false,
+    target: 'esnext'
   }
 });

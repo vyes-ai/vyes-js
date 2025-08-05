@@ -1,16 +1,12 @@
 {
   "name": "@veypi/vyesjs",
-  "version": "0.1.0",
+  "version": "0.5.0",
   "description": "vyesjs",
   "type": "module",
-  "main": "./dist/index.umd.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "module": "./dist/vyes.js",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.umd.cjs",
-      "types": "./dist/index.d.ts"
+      "import": "./dist/vyes.js"
     }
   },
   "files": [
@@ -37,7 +33,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/veypi/vyesjs.git"
+    "url": "https://github.com/vyes-ai/vyes-js.git"
   },
   "publishConfig": {
     "access": "public"
