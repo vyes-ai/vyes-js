@@ -395,7 +395,7 @@ class VRouter {
       } else {
         this.push(href)
       }
-    })
+    }, true)
 
     window.addEventListener('popstate', () => {
       this.push(window.location.href)
@@ -503,7 +503,6 @@ class Page {
   }
 
   async mount(env, originContent, layout) {
-    this.node.innerHTML = ''
 
     const parser = await vget.FetchUI(this.htmlPath, env)
     if (parser.err) {
@@ -511,6 +510,7 @@ class Page {
       let dom = document.createElement('div')
       Object.assign(dom.style, { width: '100%', height: '100%' })
       dom.append(...originContent)
+      this.node.innerHTML = ''
       this.node.append(dom)
       this.vyes.parseRef(this.htmlPath, dom, {}, env, null, true)
       return
@@ -524,13 +524,13 @@ class Page {
     this.slots = slots
 
     if (!layout) {
+      this.node.innerHTML = ''
       this.node.append(dom)
       this.vyes.parseRef(this.htmlPath, dom, {}, env, null, true)
       return
     }
 
     let layoutDom = layoutCache.get(layout)
-    console.log(this.htmlPath, layoutDom)
     if (!layoutDom) {
       let layoutUrl = layout
       if (!layoutUrl.startsWith('/')) {
@@ -545,6 +545,7 @@ class Page {
       const layoutParser = await vget.FetchUI(layoutUrl, env)
       if (layoutParser.err) {
         console.warn(`get layout ${layoutUrl} failed.`, layoutParser.err)
+        this.node.innerHTML = ''
         this.node.append(dom)
         this.vyes.parseRef(this.htmlPath, dom, {}, env, null, true)
         return
@@ -553,6 +554,7 @@ class Page {
       layoutCache.set(layout, layoutDom)
       dom.$refData = vproxy.Wrap({})
       layoutDom.$refSlots = vproxy.Wrap({ ...slots })
+      this.node.innerHTML = ''
       this.node.append(layoutDom)
       this.layoutDom = layoutDom
       this.vyes.parseRef('/layout/' + layout, layoutDom, {}, env, null, true)
@@ -563,7 +565,6 @@ class Page {
   }
 
   activate() {
-    this.node.innerHTML = ''
     // if (this.parser.title) document.title = this.parser.title
     const layoutDom = this.layoutDom
 
@@ -577,6 +578,9 @@ class Page {
         delete layoutDom.$refSlots[key]
       })
       Object.assign(layoutDom.$refSlots, this.slots)
+      if (!layoutDom.isConnected) {
+        this.node.innerHTML = ''
+      }
       this.node.append(layoutDom)
     } else {
       this.node.innerHTML = ''
