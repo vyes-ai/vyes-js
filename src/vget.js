@@ -34,7 +34,7 @@ async function getEnv(root, temp) {
       $bus: new EventBus(),
       $axios: axios.create({
         baseURL: baseURL,
-        timeout: 3000,
+        timeout: 10000,
       }),
       $message: vmessage,
       $router: null,
