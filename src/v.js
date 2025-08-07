@@ -21,46 +21,9 @@ import setupVdev from './vdev.js'
       display: none;
       -webkit-text-fill-color: transparent;
     }
-vslot, vrouter {
-  display: block;
-}
-vrouter[loading] {
-   position: relative;
-   overflow: hidden;
- }
- vrouter[loading]::before {
-   content: '';
-   position: absolute;
-   top: 0;
-   left: 0;
-   right: 0;
-   bottom: 0;
-   background: rgba(255, 255, 255, 0.8);
-   z-index: 1000;
- }
- vrouter[loading]::after {
-   content: '';
-   position: absolute;
-   top: 50%;
-   left: 50%;
-   width: 40px;
-   height: 40px;
-   margin: -20px 0 0 -20px;
-   border: 4px solid #f3f3f3;
-   border-top: 4px solid #3498db;
-   border-radius: 50%;
-   animation: spin 2s linear infinite;
-   z-index: 1001;
- }
- @keyframes spin {
-   0% {
-     transform: rotate(0deg);
-   }
-
-   100% {
-     transform: rotate(360deg);
-   }
- }
+    vslot, vrouter {
+      display: block;
+    }
 `
   if (document.head.firstChild) {
     document.head.insertBefore(globalStyle, document.head.firstChild)
@@ -473,7 +436,6 @@ vrouter[loading] {
       for (let s of target.scripts) {
         if (s.hasAttribute('active')) {
           this.onMountedRun(dom, () => {
-            console.log('active', dom)
             vproxy.AsyncRun(s.innerHTML, scopedData, env, { $node: dom, $watch: vproxy.Watch })
           }, false)
         } else {
