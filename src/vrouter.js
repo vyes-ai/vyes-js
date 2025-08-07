@@ -35,19 +35,6 @@ function parseUrlString(urlString, root) {
   }
 }
 
-const setActiveForALabel = (url) => {
-  let adoms = document.querySelectorAll(`a[active]`)
-  adoms.forEach(e => {
-    if (e.getAttribute('href') !== url) {
-      e.removeAttribute('active')
-    }
-  })
-  adoms = document.querySelectorAll(`a[href="${url}"]`)
-  console.log('setActiveForALabel', url, adoms)
-  adoms.forEach(e => {
-    e.setAttribute('active', '')
-  })
-}
 
 class VRouter {
   #routes = []
@@ -493,7 +480,7 @@ class Page {
   constructor(vyes, node, matchedRoute) {
     this.vyes = vyes
     this.node = node
-    this.layout = undefined
+    this.layoutDom = undefined
     this.matchedRoute = matchedRoute
     this.htmlPath = this.resolveHtmlPath(matchedRoute)
   }
@@ -516,48 +503,34 @@ class Page {
   }
 
   async mount(env, originContent, layout) {
+    this.node.innerHTML = ''
+
     const parser = await vget.FetchUI(this.htmlPath, env)
     if (parser.err) {
       console.warn(parser.err)
-      parser.body = document.createElement('div')
-      Object.assign(parser.body.style, { width: '100%', height: '100%' })
-      parser.body.append(...originContent)
+      let dom = document.createElement('div')
+      Object.assign(dom.style, { width: '100%', height: '100%' })
+      dom.append(...originContent)
+      this.node.append(dom)
+      this.vyes.parseRef(this.htmlPath, dom, {}, env, null, true)
+      return
     }
 
-    this.parser = parser
-    const dom = parser.body.cloneNode(true)
-    layout = layout || dom.getAttribute('layout') || ''
 
-    parser.heads.forEach(e => {
-      if (e.nodeName === 'TITLE') {
-        document.title = parser.title = e.innerText
-      }
-    })
-
-    parser.layout = layout
     const slots = {}
-
-    Array.from(dom.childNodes).forEach(e => {
-      const slotName = e.getAttribute?.('vslot')
-      if (slotName) {
-        if (!slots[slotName]) slots[slotName] = []
-        e.remove()
-        slots[slotName].push(e)
-      }
-    })
-
+    const dom = document.createElement("div")
     dom.setAttribute('vsrc', this.htmlPath)
-    dom.setAttribute('single', true)
     slots[''] = [dom]
     this.slots = slots
+
     if (!layout) {
-      this.node.innerHTML = ''
       this.node.append(dom)
       this.vyes.parseRef(this.htmlPath, dom, {}, env, null, true)
       return
     }
 
     let layoutDom = layoutCache.get(layout)
+    console.log(this.htmlPath, layoutDom)
     if (!layoutDom) {
       let layoutUrl = layout
       if (!layoutUrl.startsWith('/')) {
@@ -572,7 +545,6 @@ class Page {
       const layoutParser = await vget.FetchUI(layoutUrl, env)
       if (layoutParser.err) {
         console.warn(`get layout ${layoutUrl} failed.`, layoutParser.err)
-        this.node.innerHTML = ''
         this.node.append(dom)
         this.vyes.parseRef(this.htmlPath, dom, {}, env, null, true)
         return
@@ -581,37 +553,31 @@ class Page {
       layoutCache.set(layout, layoutDom)
       dom.$refData = vproxy.Wrap({})
       layoutDom.$refSlots = vproxy.Wrap({ ...slots })
-      if (layoutDom !== this.layout) {
-        this.node.innerHTML = ''
-        this.node.append(layoutDom)
-        this.layout = layoutDom
-      }
+      this.node.append(layoutDom)
+      this.layoutDom = layoutDom
       this.vyes.parseRef('/layout/' + layout, layoutDom, {}, env, null, true)
     } else {
+      this.layoutDom = layoutDom
       this.activate()
     }
-    this.node.removeAttribute('loading')
   }
 
   activate() {
-    if (this.parser.title) document.title = this.parser.title
+    this.node.innerHTML = ''
+    // if (this.parser.title) document.title = this.parser.title
+    const layoutDom = this.layoutDom
 
-    const layoutDom = layoutCache.get(this.parser.layout)
     if (layoutDom) {
       layoutDom.querySelectorAll("vslot").forEach(e => {
         if (e.closest('[vref]') === layoutDom && this.slots[e.getAttribute('name') || '']) {
           e.innerHTML = ''
         }
       })
-      if (layoutDom !== this.layout) {
-        this.node.innerHTML = ''
-        this.node.append(layoutDom)
-        this.layout = layoutDom
-      }
       Object.keys(layoutDom.$refSlots).forEach(key => {
         delete layoutDom.$refSlots[key]
       })
       Object.assign(layoutDom.$refSlots, this.slots)
+      this.node.append(layoutDom)
     } else {
       this.node.innerHTML = ''
       const dom = this.slots['']
@@ -642,9 +608,6 @@ const DefaultRoutes = [
     component: (path) => {
       if (path.endsWith('.html')) return path
       return '/page' + path + '.html'
-    },
-    onError: (to, from, next) => {
-      next('/404')
     },
   }
 ]
