@@ -515,6 +515,7 @@ class Page {
       this.vyes.parseRef(this.htmlPath, dom, {}, env, null, true)
       return
     }
+    this.title = parser.title || ''
 
 
     const slots = {}
@@ -565,7 +566,7 @@ class Page {
   }
 
   activate() {
-    // if (this.parser.title) document.title = this.parser.title
+    if (this.title) document.title = this.title
     const layoutDom = this.layoutDom
 
     if (layoutDom) {
