@@ -154,7 +154,7 @@ import setupVdev from './vdev.js'
       }
       let init = async () => {
         // vget.SetBaseFile(await vget.FetchFile(window.location.pathname))
-        let mainParser = await vget.FetchUI(window.location.pathname || 'root.html', {}, true)
+        let mainParser = await vget.FetchUI(window.location.pathname, {}, true)
         this.root = mainParser.env?.root || ''
         if (mainParser.env?.vdev && window.self !== window.top) {
           setupVdev()
@@ -242,7 +242,7 @@ import setupVdev from './vdev.js'
       this.parseAttrs(dom, scopedData, env)
       let childs = this.parseVif(Array.from(dom.childNodes), scopedData, env)
       for (let n of childs) {
-        await this.parseDom(n, scopedData, env)
+        this.parseDom(n, scopedData, env)
       }
       dom.vparsed = true
     }
@@ -312,10 +312,10 @@ import setupVdev from './vdev.js'
       }
       let childs = this.parseVif(Array.from(dom.childNodes), originData, env)
       for (let n of childs) {
-        await this.parseDom(n, originData, env)
+        this.parseDom(n, originData, env)
       }
       dom.removeAttribute('vparsing')
-      await this.mountRef(dom, originData, env, target)
+      this.mountRef(dom, originData, env, target)
     }
 
     /**
@@ -439,7 +439,7 @@ import setupVdev from './vdev.js'
             vproxy.AsyncRun(s.innerHTML, scopedData, env, { $node: dom, $watch: vproxy.Watch })
           }, false)
         } else {
-          await vproxy.AsyncRun(s.innerHTML, scopedData, env, { $node: dom, $watch: vproxy.Watch })
+          vproxy.AsyncRun(s.innerHTML, scopedData, env, { $node: dom, $watch: vproxy.Watch })
         }
       }
     }
