@@ -57,16 +57,26 @@ var listen_tags = []
 * @param {()=>void} callback
 * @returns number
 */
-function Watch(callback) {
+function Watch(target, callback) {
   let idx = callbackList.length
   listen_tags.push(idx)
-  callbackList.push(callback)
+  if (typeof callback === 'function') {
+    callbackList.push(() => {
+      callback(target())
+    })
+  } else {
+    callbackList.push(target)
+  }
+  let res
   try {
-    callback()
+    res = target()
   } catch (e) {
-    console.warn('running \n%s\n failed:', callback, e)
+    console.warn('running \n%s\n failed:', target, e)
   } finally {
     listen_tags.pop()
+  }
+  if (typeof callback === 'function') {
+    callback(res)
   }
   return idx
 }

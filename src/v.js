@@ -889,7 +889,7 @@ import setupVdev from './vdev.js'
     parseVif(nodes, data, env) {
       let ifCache = { now: document.createElement('div'), conds: [], doms: [] }
       const handleIf = (cache) => {
-        let ifData = { now: cache.now, conds: cache.conds, doms: cache.doms, handleFlag: {} }
+        let ifData = { now: cache.now, conds: cache.conds, doms: cache.doms }
         let ifList = []
         for (let cid in ifData.conds) {
           let c = ifData.conds[cid]
@@ -902,28 +902,22 @@ import setupVdev from './vdev.js'
         }
         let ifFc = `let res = [${ifList.join(',')}]\n return res.indexOf(true)`
         vproxy.Watch(() => {
-          let res
-          try {
-            res = vproxy.Run(ifFc, data, env)
-          } catch (e) {
-            console.error('v-if error:', ifList.join(','), e)
-            return
-          }
+          let res = vproxy.Run(ifFc, data, env)
           let tmpDom = ifData.doms[res]
-          let parsed = true
           if (!tmpDom) {
             tmpDom = document.createElement('div')
             tmpDom.style.display = 'none'
-          } else if (!ifData.handleFlag[res]) {
-            parsed = false
-            ifData.handleFlag[res] = true
-          } else {
+          }
+          return tmpDom
+        }, (tmpDom) => {
+          if (!tmpDom) {
+            return
           }
           this.onMountedRun(ifData.now, (d) => {
             d.replaceWith(tmpDom)
             ifData.now = tmpDom
           })
-          if (!parsed) {
+          if (!tmpDom?.vparsed) {
             this.parseDom(tmpDom, data, env)
           }
         })
