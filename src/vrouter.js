@@ -527,7 +527,7 @@ class Page {
     if (!layout) {
       this.node.innerHTML = ''
       this.node.append(dom)
-      this.vyes.parseRef(this.htmlPath, dom, {}, env, null, true)
+      this.vyes.parseRef(this.htmlPath, dom, {}, env, null)
       return
     }
 
@@ -548,7 +548,7 @@ class Page {
         console.warn(`get layout ${layoutUrl} failed.`, layoutParser.err)
         this.node.innerHTML = ''
         this.node.append(dom)
-        this.vyes.parseRef(this.htmlPath, dom, {}, env, null, true)
+        this.vyes.parseRef(this.htmlPath, dom, {}, env, null)
         return
       }
       layoutDom = layoutParser.body.cloneNode(true)
@@ -560,6 +560,7 @@ class Page {
       this.layoutDom = layoutDom
       this.vyes.parseRef('/layout/' + layout, layoutDom, {}, env, null, true)
     } else {
+
       this.layoutDom = layoutDom
       this.activate()
     }
