@@ -32,7 +32,8 @@ class Message {
       .message-container {
         position: fixed;
         top: 60px;
-        right: 20px;
+        left: 50%; 
+        transform: translateX(-50%);
         z-index: 9999;
         width: 300px;
       }
@@ -42,7 +43,7 @@ class Message {
         padding: 15px;
         border-radius: 4px;
         box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-        transform: translateX(100%);
+        transform: translateY(100%);
         opacity: 0;
         transition: all 0.3s ease;
         display: flex;
@@ -50,7 +51,7 @@ class Message {
       }
       
       .message-item.show {
-        transform: translateX(0);
+        transform: translateY(0);
         opacity: 1;
       }
       
