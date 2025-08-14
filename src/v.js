@@ -657,7 +657,15 @@ import setupVdev from './vdev.js'
             })();
             cb(d)
           }
-        })
+        }, false)
+      } else if (evt === 'outerclick') {
+        let func = (e) => {
+          let cb = vproxy.Run(value, data, env, { $event: e })
+          if (typeof cb === 'function') {
+            cb(e)
+          }
+        }
+        utils.AddClicker(dom, 'outer', func)
       } else if (utils.EventsList.indexOf(evt) !== -1) {
         if (evt === 'keydown' || evt === 'keyup' || evt === 'keypress') {
           if (dom.tagName !== 'INPUT' && dom.tagName !== 'TEXTAREA') {

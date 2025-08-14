@@ -428,6 +428,13 @@ class RouteMatcher {
       return `(?<${key}>[^/]+)`
     })
 
+    // 处理 *path 形式的通配符
+    regexpStr = regexpStr.replace(/\*(\w+)/g, (match, key) => {
+      this.keys.push(key)
+      return `(?<${key}>.*)`
+    });
+
+    // 如果有未处理的*号，将其替换为允许匹配任意数量字符的正则表达式
     regexpStr = regexpStr.replace(/\*/g, '.*')
     return new RegExp(`^${regexpStr}$`)
   }

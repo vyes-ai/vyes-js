@@ -13,6 +13,26 @@ function CamelToKebabCase(str) {
   return firstChar + rest;
 }
 
+const outerClickList = []
+const globalClick = document.addEventListener('click', (event) => {
+  outerClickList.forEach((item) => {
+    if (item?.dom instanceof Element && typeof item?.callback === 'function') {
+      if (!item.dom.contains(event.target)) {
+        item.callback(event)
+      }
+    }
+  })
+})
+const AddClicker = (dom, typ, callback) => {
+  if (typ === 'outer') {
+    let idx = outerClickList.length
+    outerClickList.push({ dom, callback })
+    return () => {
+      outerClickList[idx] = null
+    }
+  }
+}
+
 const EventsList = [
   // 窗口和框架事件
   'load',
@@ -259,5 +279,5 @@ function SetAttr(dom, key, value) {
 }
 
 
-export default { CamelToKebabCase, EventsList, BindInputDomValue, SetAttr }
+export default { CamelToKebabCase, EventsList, BindInputDomValue, SetAttr, AddClicker }
 
