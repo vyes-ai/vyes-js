@@ -458,12 +458,13 @@ async function ParseImport(code, scoped, env, src) {
   let root = env.root || ''
   let codeCopy = code
   let match;
+  src = src.startsWith('http') ? src : root + src
 
   const awaitImportRegex = /await import\(['"]([^'"]+)['"]\)/gm;
   while ((match = awaitImportRegex.exec(code)) !== null) {
     let url = match[1]
     if (!url.startsWith('http')) {
-      url = url.startsWith('/') ? url : '/' + url
+      url = resolvePath(url, src)
       url = window.location.origin + url
     }
     codeCopy = codeCopy.replace(match[0], `await import('${url}')`)
