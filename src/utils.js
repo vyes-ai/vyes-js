@@ -232,7 +232,9 @@ function SetAttr(dom, key, value) {
     'frameborder': 'frameBorder',
     'contenteditable': 'contentEditable',
     'spellcheck': 'spellcheck',
-    'autocapitalize': 'autocapitalize'
+    'innerhtml': 'innerHTML',
+    'innertext': 'innerText',
+    'autocapitalize': 'autocapitalize',
   };
 
   // 需要使用 DOM 属性设置的属性

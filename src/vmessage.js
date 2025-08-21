@@ -356,7 +356,7 @@ class Message {
    * @param {string} content - 提示内容
    * @param {Object} options - 配置选项
    */
-  prompt(content, options = {}) {
+  _prompt(content, options = {}) {
     return new Promise((resolve, reject) => {
       const {
         title = '提示',
@@ -503,7 +503,7 @@ class Message {
    * @param {Object} options - 配置选项
    */
   confirm(content, options = {}) {
-    return this.prompt(content, {
+    return this._prompt(content, {
       ...options,
       type: 'confirm'
     });
@@ -514,10 +514,11 @@ class Message {
    * @param {string} content - 提示内容
    * @param {Object} options - 配置选项
    */
-  input(content, options = {}) {
-    return this.prompt(content, {
+  prompt(message, content, options = {}) {
+    return this._prompt(message, {
       ...options,
-      type: 'input'
+      type: 'input',
+      inputValue: content,
     });
   }
 }
